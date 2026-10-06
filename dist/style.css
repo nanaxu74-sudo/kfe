@@ -36,9 +36,10 @@ body.is-exporting .editable-preview:hover{outline:0}.export-canvas .forum-head,.
 .hot-badge+.post-title-wrap .translation-overlay{left:84px!important;width:calc(100% - 84px)!important;max-width:calc(100% - 84px)}
 
 .vote-bar{min-height:126px;padding:30px 17px 34px;gap:10px;align-items:center;border-top:1px solid #e3e3e3}
-.vote-circle{width:68px;height:68px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
-.vote-circle b{font-size:12px;line-height:1;font-weight:800}
-.vote-thumb{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.vote-circle{width:34px;height:34px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.vote-circle b{font-size:8px;line-height:1;font-weight:800}
+.vote-thumb{width:14.5px;height:14.5px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+[data-score-edit]{cursor:pointer}
 .vote-up{background:#f13b2f;color:#fff}
 .vote-down{background:#ededed;color:#595959}
 .vote-number{font-size:25px;line-height:1;font-weight:800;min-width:30px;text-align:center}

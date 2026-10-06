@@ -121,6 +121,16 @@
     </div>
   </dialog>
 
+  <dialog id="scoreDialog" class="dialog">
+    <form id="scoreForm">
+      <h2>修改赞踩数量</h2>
+      <div class="field-row" style="margin-top:18px">
+        <div class="field"><label for="scoreLikes">点赞数</label><input id="scoreLikes" type="number" min="0" step="1" required inputmode="numeric"></div>
+        <div class="field"><label for="scoreDislikes">踩数</label><input id="scoreDislikes" type="number" min="0" step="1" required inputmode="numeric"></div>
+      </div>
+      <div class="dialog-actions"><button id="cancelScore" type="button">取消</button><button type="submit" class="primary-btn">保存数量</button></div>
+    </form>
+  </dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="./html2canvas.min.js"></script>
   <script src="./storage.js"></script>
