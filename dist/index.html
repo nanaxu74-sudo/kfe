@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="手机优先的韩国论坛截图创作与长图导出工具" />
+  <title>韩国论坛体编辑器</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fff'/%3E%3Cpath d='M5 24V8h7v3c2-3 5-4 8-3 4 1 6 4 6 9v7h-7v-7c0-2-1-3-3-3s-4 2-4 5v5z' fill='%23ea5548'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header class="appbar">
+    <div class="brand"><span class="brand-mark">n</span><span>韩国论坛体编辑器</span><span class="save-state" id="saveState">已保存</span></div>
+    <div class="appbar-actions">
+      <select id="draftSelect" aria-label="选择草稿"></select>
+      <button id="draftMenuBtn" class="tool-btn">草稿管理</button>
+      <button id="importBtn" class="tool-btn" title="导入之前备份的 .kforum.json 草稿文件">导入草稿</button>
+      <button id="exportDraftBtn" class="tool-btn" title="下载可再次编辑的草稿文件，不是图片">备份草稿</button>
+      <input id="importInput" type="file" accept="application/json,.json" hidden />
+    </div>
+  </header>
+
+  <div class="viewbar">
+    <div class="segmented" role="tablist" aria-label="预览模式">
+      <button data-mode="original" class="active">原文版</button>
+      <button data-mode="overlay">原文＋翻译</button>
+      <button data-mode="translated">纯中文版</button>
+    </div>
+    <div class="export-actions">
+      <button id="exportFullBtn" class="primary-btn">导出 PNG 长图</button>
+      <button id="exportSplitBtn" class="tool-btn">自选截图</button>
+    </div>
+  </div>
+
+  <main class="workspace">
+    <aside class="editor-panel" id="editorPanel" aria-label="内容编辑器">
+      <div class="panel-head">
+        <div>
+          <div class="eyebrow">正在编辑</div>
+          <h2 id="editorTitle">主帖</h2>
+        </div>
+        <button id="closeEditorBtn" class="icon-btn" aria-label="关闭编辑面板">×</button>
+      </div>
+      <div class="editor-tabs">
+        <button data-section="post" class="active">主帖</button>
+        <button data-section="comments">评论</button>
+        <button data-section="settings">导出设置</button>
+      </div>
+      <div id="editorFields" class="editor-fields"></div>
+    </aside>
+
+    <section class="stage" aria-label="成品预览">
+      <div class="stage-label"><span>390px 成品画布</span><span>点击文字即可编辑</span></div>
+      <div class="phone-shell">
+        <article id="forumPreview" class="forum-page" data-preview-mode="original"></article>
+      </div>
+    </section>
+  </main>
+
+  <button id="mobileEditBtn" class="mobile-edit-btn">编辑当前内容</button>
+
+  <dialog id="draftDialog" class="dialog">
+    <form method="dialog">
+      <div class="dialog-head"><h2>草稿管理</h2><button value="cancel" class="icon-btn">×</button></div>
+      <p class="draft-file-help"><strong>草稿仅保存在当前浏览器，不会跨设备自动同步。</strong>清理浏览器数据可能导致丢失，请定期备份。备份的 <code>.kforum.json</code> 文件包含文字、图片、评论及翻译设置，可导入恢复。旧站草稿请先在旧站备份，再到本站导入。</p>
+      <div class="dialog-grid">
+        <button type="button" id="newDraftBtn">新建草稿</button>
+        <button type="button" id="renameDraftBtn">重命名</button>
+        <button type="button" id="duplicateDraftBtn">复制草稿</button>
+        <button type="button" id="deleteDraftBtn" class="danger">删除草稿</button>
+        <button type="button" id="dialogImportBtn">导入草稿文件</button>
+        <button type="button" id="dialogExportDraftBtn">备份当前草稿</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirmDialog" class="dialog confirm-dialog">
+    <form method="dialog">
+      <h2 id="confirmTitle">确认删除</h2>
+      <p id="confirmText">删除后无法恢复。</p>
+      <div class="dialog-actions"><button value="cancel">取消</button><button id="confirmOk" value="default" class="danger">删除</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="exportDialog" class="export-dialog">
+    <div class="dialog-head"><div><div class="eyebrow">导出完成</div><h2 id="exportDialogTitle">图片预览</h2></div><button id="closeExportDialog" class="icon-btn">×</button></div>
+    <p id="exportMessage"></p>
+    <div id="exportGallery" class="export-gallery"></div>
+  </dialog>
+
+  <dialog id="manualCropDialog" class="manual-crop-dialog">
+    <div class="dialog-head">
+      <div><div class="eyebrow">手动分图</div><h2>选择截图范围</h2></div>
+      <button id="closeManualCrop" class="icon-btn" aria-label="关闭自选截图">×</button>
+    </div>
+    <p class="crop-help">先选择图片比例，再拖动红色选区。可以连续加入多张，最后统一生成 PNG。</p>
+    <div class="crop-ratios" role="radiogroup" aria-label="截图比例">
+      <button type="button" data-ratio="1">1:1</button>
+      <button type="button" data-ratio="0.75" class="active">3:4</button>
+      <button type="button" data-ratio="0.5625">9:16</button>
+      <button type="button" data-ratio="free">自定义</button>
+    </div>
+    <label class="crop-height-row" for="cropHeight">截图高度 <input id="cropHeight" type="range" min="300" max="1800" step="10" value="520"><output id="cropHeightValue">520px</output></label>
+    <div id="cropViewport" class="crop-viewport">
+      <div id="cropPreviewWrap" class="crop-preview-wrap">
+        <img id="cropPreviewImage" alt="整页截图预览">
+        <div id="cropSelection" class="crop-selection" tabindex="0"><span>拖动选区</span></div>
+      </div>
+    </div>
+    <label class="crop-position-row" for="cropPosition">起始位置 <input id="cropPosition" type="range" min="0" max="0" step="1" value="0"><output id="cropPositionValue">0px</output></label>
+    <div class="crop-nudge">
+      <button type="button" id="cropPrevBtn">向上移一屏</button>
+      <button type="button" id="cropNextBtn">向下移一屏</button>
+    </div>
+    <div id="cropQueue" class="crop-queue">尚未加入截图</div>
+    <div class="crop-actions">
+      <button type="button" id="clearCropQueue">清空</button>
+      <button type="button" id="addCropRange">＋ 加入这一张</button>
+      <button type="button" id="generateCropImages" class="primary-btn" disabled>生成已选图片</button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./html2canvas.min.js"></script>
+  <script src="./storage.js"></script>
+</body>
+</html>
