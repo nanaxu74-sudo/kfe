@@ -2,7 +2,7 @@
 
 手机优先的虚构论坛截图编辑器。支持中韩双语、评论与楼中楼、翻译覆盖层、图片上传、PNG 长图及手动比例截图。
 
-网站：https://nanaxu74-sudo.github.io/korean-forum-editor/
+网站：https://nanaxu74-sudo.github.io/kfe/
 
 ## 本地运行与检查
 
@@ -19,7 +19,7 @@ node --check dist/storage.js
 
 ## 部署与更新
 
-GitHub 仓库 `nanaxu74-sudo/korean-forum-editor`，正式分支 `main`。
+GitHub 仓库 `nanaxu74-sudo/kfe`，正式分支 `main`。
 Settings → Pages → Source 选择 GitHub Actions。
 修改 `dist` 内的文件，检查后提交并推送到 `main`，官方 Pages 工作流自动检查并上传 `dist`，部署到 `github-pages` environment。也可在 Actions → Deploy GitHub Pages → Run workflow 手动发布。使用工作流身份，不需要个人访问令牌。
 
