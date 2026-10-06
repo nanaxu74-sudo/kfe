@@ -26,7 +26,7 @@ function renderPreview(){const d=current(),p=d.post,count=totalComments(d);previ
   <section class="post-head ${p.hot?'with-hot':''}" data-cut-boundary>
     ${p.hot?talkerBadge():''}
     <div class="post-title-wrap editable-preview" data-edit="post-title"><h1 class="post-title original-layer">${esc(p.title)}</h1>${mode==='translated'?`<h1 class="post-title">${esc(p.titleZh||p.title)}</h1>`:overlayHTML(p.titleZh,{x:0,y:4,width:100,fontSize:17})}</div>
-    <div class="post-meta editable-preview" data-edit="post-meta">${esc(p.author)} ｜ ${esc(p.time)}<br>조회 ${esc(p.views)} ｜ 추천 <span class="accent">${esc(p.likes)}</span></div>
+    <div class="post-meta editable-preview" data-edit="post-meta">${esc(p.author)} ｜ ${esc(p.time)}<br>조회 ${esc(p.views)} ｜ 추천 <span class="accent" data-score-edit="post" role="button" tabindex="0" aria-label="修改推荐数">${esc(p.likes)}</span></div>
     <div class="post-head-actions"><button class="outline-pill">⇧ 톡 공유하기</button><div class="mini-actions"><span>댓글 <b class="accent">${count}</b></span><span>댓글쓰기</span><span>•••</span></div></div>
   </section>
   <section class="post-body">${p.blocks.map((b,i)=>renderBlock(b,i)).join('')}</section>
@@ -75,6 +75,11 @@ function openScoreEditor(el){if(el.dataset.scoreEdit==='post')scoreTarget=curren
 preview.addEventListener('keydown',e=>{const el=e.target.closest('[data-score-edit]');if(el&&['Enter',' '].includes(e.key)){e.preventDefault();openScoreEditor(el)}});
 $('#scoreForm').onsubmit=e=>{e.preventDefault();if(!scoreTarget)return;scoreTarget.likes=Math.max(0,Math.floor(Number($('#scoreLikes').value)||0));scoreTarget.dislikes=Math.max(0,Math.floor(Number($('#scoreDislikes').value)||0));persist();renderPreview();renderEditor();$('#scoreDialog').close();scoreTarget=null};
 $('#cancelScore').onclick=()=>$('#scoreDialog').close();
+$('#editPostScore').onclick=()=>openScoreEditor({dataset:{scoreEdit:'post'}});
+function fitScoreDialog(){const viewport=window.visualViewport;document.documentElement.style.setProperty('--score-center',`${(viewport?.offsetTop||0)+(viewport?.height||innerHeight)/2}px`);document.documentElement.style.setProperty('--score-height',`${Math.max(160,(viewport?.height||innerHeight)-24)}px`)}
+window.visualViewport?.addEventListener('resize',fitScoreDialog);
+window.visualViewport?.addEventListener('scroll',fitScoreDialog);
+window.addEventListener('resize',fitScoreDialog);fitScoreDialog();
 document.querySelectorAll('.editor-tabs button').forEach(b=>b.addEventListener('click',()=>{editSection=b.dataset.section;active=editSection==='comments'?{kind:'comments-list'}:{kind:'post'};renderEditor()}));
 document.querySelectorAll('.segmented button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;document.querySelectorAll('.segmented button').forEach(x=>x.classList.toggle('active',x===b));renderPreview()}));
 $('#draftSelect').addEventListener('change',e=>{currentId=e.target.value;store.currentId=currentId;active={kind:'post'};persist();renderAll()});
