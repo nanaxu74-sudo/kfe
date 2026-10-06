@@ -39,19 +39,7 @@ body.is-exporting .editable-preview:hover{outline:0}.export-canvas .forum-head,.
 .vote-circle{width:34px;height:34px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
 .vote-circle b{font-size:8px;line-height:1;font-weight:800}
 .vote-thumb{width:14.5px;height:14.5px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-[data-score-edit]{cursor:pointer;touch-action:manipulation}
-.stage-label{flex-wrap:wrap;align-items:center;gap:8px;padding:12px!important;background:#fff;border:1px solid #ddd;line-height:1.5;font-size:13px;color:#555}
-.stage-label .edit-hint{width:100%;font-size:19px;font-weight:800;color:#c9362c}
-.stage-label button{min-height:44px;height:auto;font-size:14px;font-weight:700}
-.comment-score{position:relative}
-.comment-score:after{content:"";position:absolute;inset:-14px -4px;min-height:44px}
-.post-meta [data-score-edit]{display:inline-block;position:relative}
-.post-meta [data-score-edit]:after{content:"";position:absolute;inset:-10px -8px}
-#scoreDialog{position:fixed;left:50%;top:var(--score-center,50%);bottom:auto;margin:0;transform:translate(-50%,-50%);max-height:var(--score-height,85vh);overflow:auto}
-#scoreDialog input{font-size:18px;min-height:48px}
-#scoreDialog .field label{font-size:15px}
-#scoreDialog .dialog-actions{position:sticky;bottom:-18px;background:#fff;padding:12px 0;display:grid;grid-template-columns:1fr 1fr}
-#scoreDialog .dialog-actions button{min-height:48px;font-size:16px}
+.stage-label span:last-child{font-size:14px;font-weight:600;color:#555}
 .vote-up{background:#f13b2f;color:#fff}
 .vote-down{background:#ededed;color:#595959}
 .vote-number{font-size:25px;line-height:1;font-weight:800;min-width:30px;text-align:center}

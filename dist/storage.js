@@ -27,6 +27,6 @@ window.saveDraftStore = async value => {
     window.draftStorageUnavailable = true;
   }
   const script = document.createElement('script');
-  script.src = './app.js?v=mobile-score-2';
+  script.src = './app.js?v=compact-editor-3';
   document.body.append(script);
 })();

@@ -26,18 +26,18 @@ function renderPreview(){const d=current(),p=d.post,count=totalComments(d);previ
   <section class="post-head ${p.hot?'with-hot':''}" data-cut-boundary>
     ${p.hot?talkerBadge():''}
     <div class="post-title-wrap editable-preview" data-edit="post-title"><h1 class="post-title original-layer">${esc(p.title)}</h1>${mode==='translated'?`<h1 class="post-title">${esc(p.titleZh||p.title)}</h1>`:overlayHTML(p.titleZh,{x:0,y:4,width:100,fontSize:17})}</div>
-    <div class="post-meta editable-preview" data-edit="post-meta">${esc(p.author)} ｜ ${esc(p.time)}<br>조회 ${esc(p.views)} ｜ 추천 <span class="accent" data-score-edit="post" role="button" tabindex="0" aria-label="修改推荐数">${esc(p.likes)}</span></div>
+    <div class="post-meta editable-preview" data-edit="post-meta">${esc(p.author)} ｜ ${esc(p.time)}<br>조회 ${esc(p.views)} ｜ 추천 <span class="accent">${esc(p.likes)}</span></div>
     <div class="post-head-actions"><button class="outline-pill">⇧ 톡 공유하기</button><div class="mini-actions"><span>댓글 <b class="accent">${count}</b></span><span>댓글쓰기</span><span>•••</span></div></div>
   </section>
   <section class="post-body">${p.blocks.map((b,i)=>renderBlock(b,i)).join('')}</section>
-  <div class="vote-bar" data-cut-boundary data-score-edit="post" role="button" tabindex="0" aria-label="修改主帖点赞和踩数"><strong class="vote-number vote-up-number">${esc(p.likes)}</strong><div class="vote-circle vote-up">${thumbSvg('up','vote-thumb')}<b>추천</b></div><div class="vote-circle vote-down">${thumbSvg('down','vote-thumb')}<b>반대</b></div><strong class="vote-number vote-down-number">${esc(p.dislikes)}</strong></div>
+  <div class="vote-bar" data-cut-boundary><strong class="vote-number vote-up-number">${esc(p.likes)}</strong><div class="vote-circle vote-up">${thumbSvg('up','vote-thumb')}<b>추천</b></div><div class="vote-circle vote-down">${thumbSvg('down','vote-thumb')}<b>반대</b></div><strong class="vote-number vote-down-number">${esc(p.dislikes)}</strong></div>
   <section class="comments-head" data-cut-boundary><h3>댓글 <b>${count}</b></h3><div class="comment-tabs"><b>최신순</b><span>랭킹댓글</span><span>사진댓글</span></div></section>
   <section class="comments">${d.comments.map((c,i)=>renderComment(c,i,false)).join('')}</section>
   <footer class="forum-footer" data-cut-boundary>© NATE Communications · fictional forum mockup</footer>`;
 }
 function renderBlock(b,i){if(b.type==='image')return `<div class="content-block editable-preview" data-cut-boundary data-edit="block" data-index="${i}"><img class="body-image original-layer" src="${b.src}" alt="上传的正文图片" /></div>`;const shown=t(b.original,b.translation);return `<div class="content-block editable-preview" data-cut-boundary data-edit="block" data-index="${i}"><div class="body-text original-layer">${esc(b.original)}</div>${mode==='translated'?`<div class="body-text">${esc(shown)}</div>`:overlayHTML(b.translation,b.overlay)}</div>`}
 function renderComment(c,i,isReply,parentIndex){const shown=t(c.original,c.translation),deleted=c.deleted;return `<article class="comment ${c.hot?'hot ':''}${isReply?'reply':''}" data-cut-boundary data-edit="comment" data-index="${i}" ${isReply?`data-parent="${parentIndex}"`:''}>
- <div class="comment-top"><div class="comment-identity">${c.hot?bestBadge():''}<div class="comment-who"><span class="comment-name">${esc(c.nickname)}</span>${c.author?'<span class="author-tag">작성자</span>':''} ｜ ${esc(c.time)}</div></div><div class="comment-score" data-score-edit="comment" role="button" tabindex="0" aria-label="修改这条评论点赞和踩数"><span class="up">♧ ${esc(c.likes)}</span><span>♧ ${esc(c.dislikes)}</span></div></div>
+ <div class="comment-top"><div class="comment-identity">${c.hot?bestBadge():''}<div class="comment-who"><span class="comment-name">${esc(c.nickname)}</span>${c.author?'<span class="author-tag">작성자</span>':''} ｜ ${esc(c.time)}</div></div><div class="comment-score"><span class="up">♧ ${esc(c.likes)}</span><span>♧ ${esc(c.dislikes)}</span></div></div>
  <div class="comment-text">${c.replyTo&&!deleted?`<span class="reply-target">@${esc(c.replyTo)}</span>`:''}<span class="original-layer ${deleted?'deleted-text':''}">${esc(deleted?'삭제된 댓글입니다.':c.original)}</span>${mode==='translated'?`<span class="${deleted?'deleted-text':''}">${esc(deleted?'该评论已删除。':shown)}</span>`:overlayHTML(deleted?'该评论已删除。':c.translation,c.overlay)}</div>
  <div class="comment-bottom"><span class="reply-btn">답글 ${c.replies?.length||0}</span> <span class="reply-btn">답글쓰기</span></div></article>${!isReply?(c.replies||[]).map((r,ri)=>renderComment(r,ri,true,i)).join(''):''}`}
 
@@ -69,17 +69,7 @@ function handleAction(a,el){const d=current(),i=Number(el.dataset.index),r=Numbe
  queueSave();renderPreview();renderEditor();
 }
 $('#editorFields').addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(b)handleAction(b.dataset.action,b)});
-preview.addEventListener('click',e=>{const score=e.target.closest('[data-score-edit]');if(score){openScoreEditor(score);return}const el=e.target.closest('[data-edit]');if(!el)return;if(el.dataset.edit==='post-title'||el.dataset.edit==='post-meta'){active={kind:'post'};editSection='post'}else if(el.dataset.edit==='block'){active={kind:'block',index:Number(el.dataset.index)};editSection='post'}else{active={kind:'comment',index:Number(el.dataset.index),...(el.dataset.parent!=null?{parentIndex:Number(el.dataset.parent)}:{})};editSection='comments'}renderEditor();openMobileEditor()});
-let scoreTarget=null;
-function openScoreEditor(el){if(el.dataset.scoreEdit==='post')scoreTarget=current().post;else{const row=el.closest('[data-edit="comment"]');scoreTarget=row.dataset.parent==null?current().comments[Number(row.dataset.index)]:current().comments[Number(row.dataset.parent)].replies[Number(row.dataset.index)]}$('#scoreLikes').value=scoreTarget.likes;$('#scoreDislikes').value=scoreTarget.dislikes;$('#scoreDialog').showModal()}
-preview.addEventListener('keydown',e=>{const el=e.target.closest('[data-score-edit]');if(el&&['Enter',' '].includes(e.key)){e.preventDefault();openScoreEditor(el)}});
-$('#scoreForm').onsubmit=e=>{e.preventDefault();if(!scoreTarget)return;scoreTarget.likes=Math.max(0,Math.floor(Number($('#scoreLikes').value)||0));scoreTarget.dislikes=Math.max(0,Math.floor(Number($('#scoreDislikes').value)||0));persist();renderPreview();renderEditor();$('#scoreDialog').close();scoreTarget=null};
-$('#cancelScore').onclick=()=>$('#scoreDialog').close();
-$('#editPostScore').onclick=()=>openScoreEditor({dataset:{scoreEdit:'post'}});
-function fitScoreDialog(){const viewport=window.visualViewport;document.documentElement.style.setProperty('--score-center',`${(viewport?.offsetTop||0)+(viewport?.height||innerHeight)/2}px`);document.documentElement.style.setProperty('--score-height',`${Math.max(160,(viewport?.height||innerHeight)-24)}px`)}
-window.visualViewport?.addEventListener('resize',fitScoreDialog);
-window.visualViewport?.addEventListener('scroll',fitScoreDialog);
-window.addEventListener('resize',fitScoreDialog);fitScoreDialog();
+preview.addEventListener('click',e=>{const el=e.target.closest('[data-edit]');if(!el)return;if(el.dataset.edit==='post-title'||el.dataset.edit==='post-meta'){active={kind:'post'};editSection='post'}else if(el.dataset.edit==='block'){active={kind:'block',index:Number(el.dataset.index)};editSection='post'}else{active={kind:'comment',index:Number(el.dataset.index),...(el.dataset.parent!=null?{parentIndex:Number(el.dataset.parent)}:{})};editSection='comments'}renderEditor();openMobileEditor()});
 document.querySelectorAll('.editor-tabs button').forEach(b=>b.addEventListener('click',()=>{editSection=b.dataset.section;active=editSection==='comments'?{kind:'comments-list'}:{kind:'post'};renderEditor()}));
 document.querySelectorAll('.segmented button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;document.querySelectorAll('.segmented button').forEach(x=>x.classList.toggle('active',x===b));renderPreview()}));
 $('#draftSelect').addEventListener('change',e=>{currentId=e.target.value;store.currentId=currentId;active={kind:'post'};persist();renderAll()});

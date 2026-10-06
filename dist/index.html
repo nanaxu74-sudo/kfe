@@ -7,7 +7,7 @@
   <meta name="description" content="手机优先的韩国论坛截图创作与长图导出工具" />
   <title>韩国论坛体编辑器</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fff'/%3E%3Cpath d='M5 24V8h7v3c2-3 5-4 8-3 4 1 6 4 6 9v7h-7v-7c0-2-1-3-3-3s-4 2-4 5v5z' fill='%23ea5548'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="./style.css?v=mobile-score-2" />
+  <link rel="stylesheet" href="./style.css?v=compact-editor-3" />
 </head>
 <body>
   <header class="appbar">
@@ -51,7 +51,7 @@
     </aside>
 
     <section class="stage" aria-label="成品预览">
-      <div class="stage-label"><strong class="edit-hint">点击文字即可编辑</strong><span>点击赞踩数字可改数量</span><button id="editPostScore" class="tool-btn">修改主帖赞踩</button></div>
+      <div class="stage-label"><span>390px 成品画布</span><span>点击文字即可编辑</span></div>
       <div class="phone-shell">
         <article id="forumPreview" class="forum-page" data-preview-mode="original"></article>
       </div>
@@ -121,18 +121,8 @@
     </div>
   </dialog>
 
-  <dialog id="scoreDialog" class="dialog">
-    <form id="scoreForm">
-      <h2>修改赞踩数量</h2>
-      <div class="field-row" style="margin-top:18px">
-        <div class="field"><label for="scoreLikes">点赞数</label><input id="scoreLikes" type="number" min="0" step="1" required inputmode="numeric"></div>
-        <div class="field"><label for="scoreDislikes">踩数</label><input id="scoreDislikes" type="number" min="0" step="1" required inputmode="numeric"></div>
-      </div>
-      <div class="dialog-actions"><button id="cancelScore" type="button">取消</button><button type="submit" class="primary-btn">保存数量</button></div>
-    </form>
-  </dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="./html2canvas.min.js"></script>
-  <script src="./storage.js?v=mobile-score-2"></script>
+  <script src="./storage.js?v=compact-editor-3"></script>
 </body>
 </html>
