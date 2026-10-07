@@ -57,7 +57,8 @@ function getActiveComment(){const d=current();return active.parentIndex==null?d.
 function setPath(obj,path,val){const keys=path.split('.');let ref=obj;for(let i=0;i<keys.length-1;i++){ref[keys[i]]??={};ref=ref[keys[i]]}ref[keys.at(-1)]=val}
 function activeObjectForKey(key){const d=current();if(key.startsWith('post.'))return d;if(key.startsWith('settings.'))return d;if(active.kind==='block')return d.post.blocks[active.index];if(active.kind==='comment')return getActiveComment();return d}
 function bindEditorInputs(){document.querySelectorAll('#editorFields [data-key]').forEach(el=>el.addEventListener(el.type==='checkbox'?'change':'input',()=>{let v=el.type==='checkbox'?el.checked:el.value;if(el.type==='number')v=Number(v);setPath(activeObjectForKey(el.dataset.key),el.dataset.key,v);queueSave();renderPreview()}));const up=$('#imageUpload');if(up)up.addEventListener('change',handleImages)}
-async function handleImages(e){const files=[...e.target.files];for(const file of files){if(!file.type.startsWith('image/'))continue;const src=await resizeImage(file,1600,.9);current().post.blocks.push({id:uid('img'),type:'image',src})}queueSave();renderPreview();renderEditor();toast(`已添加 ${files.length} 张图片`)}
+async function handleImages(e){const files=[...e.target.files],draft=current();if(!files.length)return;let added=0,failed=0;toast('正在处理图片…');for(const file of files){try{if(!file.type.startsWith('image/'))throw Error('图片格式不支持');const src=await resizeImage(file,1600,.9);draft.post.blocks.push({id:uid('img'),type:'image',src});added++}catch(error){failed++}}e.target.value='';if(added){queueSave();renderPreview();renderEditor()}toast(failed?`已添加 ${added} 张，${failed} 张读取失败，请尝试 JPG 或 PNG`:`已给主帖添加 ${added} 张图片`)}
+$('#quickImageUpload').addEventListener('change',handleImages);
 function resizeImage(file,max,q){return new Promise((res,rej)=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const scale=Math.min(1,max/img.width,max/img.height),c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',q))};img.onerror=rej;img.src=url})}
 function move(arr,i,dir){const j=i+dir;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]]}
 function newComment(replyTo=''){return{id:uid(replyTo?'r':'c'),nickname:'ㅇㅇ',time:'2026.10.06 01:30',original:'새 댓글을 입력하세요.',translation:'请输入新评论。',likes:0,dislikes:0,author:false,hot:false,deleted:false,replyTo,overlay:{x:2,y:0,width:94,fontSize:14},replies:[]}}
@@ -70,7 +71,7 @@ function handleAction(a,el){const d=current(),i=Number(el.dataset.index),r=Numbe
 }
 $('#editorFields').addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(b)handleAction(b.dataset.action,b)});
 preview.addEventListener('click',e=>{const el=e.target.closest('[data-edit]');if(!el)return;if(el.dataset.edit==='post-title'||el.dataset.edit==='post-meta'){active={kind:'post'};editSection='post'}else if(el.dataset.edit==='block'){active={kind:'block',index:Number(el.dataset.index)};editSection='post'}else{active={kind:'comment',index:Number(el.dataset.index),...(el.dataset.parent!=null?{parentIndex:Number(el.dataset.parent)}:{})};editSection='comments'}renderEditor();openMobileEditor()});
-document.querySelectorAll('.editor-tabs button').forEach(b=>b.addEventListener('click',()=>{editSection=b.dataset.section;active=editSection==='comments'?{kind:'comments-list'}:{kind:'post'};renderEditor()}));
+document.querySelectorAll('.editor-tabs button').forEach(b=>b.addEventListener('click',()=>{editSection=b.dataset.section;active=editSection==='comments'?{kind:'comments-list'}:{kind:'post'};renderEditor();$('#editorPanel').scrollTop=0}));
 document.querySelectorAll('.segmented button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;document.querySelectorAll('.segmented button').forEach(x=>x.classList.toggle('active',x===b));renderPreview()}));
 $('#draftSelect').addEventListener('change',e=>{currentId=e.target.value;store.currentId=currentId;active={kind:'post'};persist();renderAll()});
 $('#draftMenuBtn').onclick=()=>$('#draftDialog').showModal();
@@ -85,8 +86,8 @@ $('#importBtn').onclick=()=>$('#importInput').click();
 $('#dialogImportBtn').onclick=()=>{$('#draftDialog').close();$('#importInput').click()};
 $('#dialogExportDraftBtn').onclick=()=>{$('#draftDialog').close();$('#exportDraftBtn').click()};
 $('#importInput').onchange=async e=>{try{const data=JSON.parse(await e.target.files[0].text()),d=data.draft||data;if(!d.post||!Array.isArray(d.comments))throw Error();d.id=uid('draft');d.name=(d.name||'导入草稿')+' · 导入';store.drafts.push(d);currentId=d.id;store.currentId=currentId;persist();renderAll();toast('草稿已导入')}catch(err){toast('文件格式不正确')}e.target.value=''};
-function openMobileEditor(){if(innerWidth<=800)$('#editorPanel').classList.add('open')}
-$('#mobileEditBtn').onclick=()=>{$('#editorPanel').classList.add('open')};$('#closeEditorBtn').onclick=()=>$('#editorPanel').classList.remove('open');
+function openMobileEditor(){if(innerWidth<=800){$('#editorPanel').classList.add('open');$('#editorPanel').scrollTop=0}}
+$('#mobileEditBtn').onclick=()=>{openMobileEditor()};$('#closeEditorBtn').onclick=()=>$('#editorPanel').classList.remove('open');
 
 function safeName(s){return String(s).replace(/[\\/:*?"<>|]/g,'-').slice(0,60)}
 function cssText(){let out='';for(const sheet of [...document.styleSheets]){try{for(const rule of [...sheet.cssRules])out+=rule.cssText+'\n'}catch(e){}}return out}
