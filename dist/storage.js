@@ -27,6 +27,6 @@ window.saveDraftStore = async value => {
     window.draftStorageUnavailable = true;
   }
   const script = document.createElement('script');
-  script.src = './app.js?v=comment-image-5';
+  script.src = './app.js?v=comment-image-6';
   document.body.append(script);
 })();
